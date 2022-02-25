@@ -7,11 +7,18 @@ import co.ke.copia.repo.LocalRepository
 class MainViewModelFactory(
     private val repository: LocalRepository
 ) : ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    /* override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
+            return MainViewModel(repository) as T
+        }
+        throw IllegalArgumentException("Unknown View Model class")
+    }*/
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
             return MainViewModel(repository) as T
         }
         throw IllegalArgumentException("Unknown View Model class")
     }
+
 
 }
