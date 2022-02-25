@@ -20,7 +20,6 @@ import co.ke.copia.models.PaymentItem
 import co.ke.copia.models.ReceiptItem
 import co.ke.copia.repo.CopiaDatabase
 import co.ke.copia.repo.LocalRepository
-import java.lang.String
 import kotlin.Int
 import kotlin.let
 
@@ -135,7 +134,7 @@ class MainActivity : AppCompatActivity() {
             binding.logs.text = "Oops! You haven't entered any allocation amount "
             return
         }
-        allocatedAmount = String.valueOf(binding.amount.text).toInt()
+        allocatedAmount = binding.amount.text.toString().toInt()
         if (data_receipt.size > 0) {
             for (i in data_receipt.indices) {
                 if (binding.receiptSpinner.selectedItem.toString() == data_receipt[i].receipt
