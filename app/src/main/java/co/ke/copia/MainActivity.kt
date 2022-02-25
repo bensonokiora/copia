@@ -1,7 +1,6 @@
 package co.ke.copia
 
 import android.annotation.SuppressLint
-import android.content.DialogInterface
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -20,8 +19,6 @@ import co.ke.copia.models.PaymentItem
 import co.ke.copia.models.ReceiptItem
 import co.ke.copia.repo.CopiaDatabase
 import co.ke.copia.repo.LocalRepository
-import kotlin.Int
-import kotlin.let
 
 class MainActivity : AppCompatActivity() {
 
@@ -74,7 +71,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.fabDeleteAll.setOnClickListener {
-             deleteAllocations()
+            deleteAllocations()
         }
 
     }
@@ -99,10 +96,10 @@ class MainActivity : AppCompatActivity() {
         if (it != null) {
             if (it.isNotEmpty()) {
                 data_payments = java.util.ArrayList()
-                data_payments!!.addAll(it)
+                data_payments.addAll(it)
                 val adapter = ArrayAdapter(
                     this, android.R.layout.simple_spinner_item,
-                    data_payments!!
+                    data_payments
                 )
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 binding.mpesaRefSpinner.adapter = adapter
@@ -217,11 +214,13 @@ class MainActivity : AppCompatActivity() {
             val builder = AlertDialog.Builder(it)
             builder.apply {
                 setTitle("Delete all amount allocated?")
-                setPositiveButton(R.string.delete
+                setPositiveButton(
+                    R.string.delete
                 ) { _, _ ->
                     mainViewModel.clearAllAllocation()
                 }
-                setNegativeButton(R.string.cancel
+                setNegativeButton(
+                    R.string.cancel
                 ) { dialog, _ ->
                     dialog.dismiss()
                 }

@@ -8,7 +8,11 @@ import co.ke.copia.models.AllocationItem
 import co.ke.copia.models.PaymentItem
 import co.ke.copia.models.ReceiptItem
 
-@Database(entities = [ReceiptItem::class, AllocationItem::class, PaymentItem::class], exportSchema = false, version = 1)
+@Database(
+    entities = [ReceiptItem::class, AllocationItem::class, PaymentItem::class],
+    exportSchema = false,
+    version = 1
+)
 abstract class CopiaDatabase : RoomDatabase() {
     abstract val receiptsDAO: ReceiptsDAO
     abstract val transactionsDAO: TransactionsDAO

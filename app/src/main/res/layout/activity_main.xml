@@ -104,7 +104,7 @@
                     android:id="@+id/allocation_layout"
                     layout="@layout/allocation_layout" />
             </LinearLayout>
-                </ScrollView>
+        </ScrollView>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_delete_all"
