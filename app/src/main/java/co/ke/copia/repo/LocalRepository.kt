@@ -1,23 +1,20 @@
 package co.ke.copia.repo
 
+import androidx.lifecycle.LiveData
 import co.ke.copia.models.AllocationItem
+import co.ke.copia.models.PaymentItem
+import co.ke.copia.models.ReceiptItem
 
-class LocalRepository(
-    private val receiptsDAO: ReceiptsDAO,
-    private val transactionsDAO: TransactionsDAO,
-    private val allocationDAO: AllocationDAO
-) {
+interface LocalRepository {
 
-    val receipts = receiptsDAO.getAllReceipts()
-    val transactions = transactionsDAO.getAllTransactions()
-    val allocations = allocationDAO.getAllAllocations()
+    suspend fun insertAllocation(allocation: AllocationItem)
 
+    suspend fun deleteAllAllocations()
 
-    suspend fun insertAllocation(allocations: AllocationItem): Long {
-        return allocationDAO.insertAllocation(allocations)
-    }
+    suspend fun getAllReceipts(): LiveData<MutableList<ReceiptItem>>
 
-    suspend fun deleteAllAllocations(): Int {
-        return allocationDAO.deleteAll()
-    }
+    suspend fun getAllTransactions(): LiveData<MutableList<PaymentItem>>
+
+    suspend fun getAllAllocations(): LiveData<MutableList<AllocationItem>>
+
 }

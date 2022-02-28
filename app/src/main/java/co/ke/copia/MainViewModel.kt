@@ -1,49 +1,57 @@
 package co.ke.copia
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import co.ke.copia.models.AllocationItem
+import co.ke.copia.models.PaymentItem
+import co.ke.copia.models.ReceiptItem
 import co.ke.copia.repo.LocalRepository
-import kotlinx.coroutines.flow.collect
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MainViewModel(private val repository: LocalRepository) : ViewModel() {
+@HiltViewModel
+class MainViewModel @Inject constructor(private val repository: LocalRepository) : ViewModel() {
 
     private val statusMessage = MutableLiveData<Event<String>>()
+    var allocations: LiveData<MutableList<AllocationItem>> = MutableLiveData()
+    var receipts: LiveData<MutableList<ReceiptItem>> = MutableLiveData()
+    var transactions: LiveData<MutableList<PaymentItem>> = MutableLiveData()
+
     val message: LiveData<Event<String>>
         get() = statusMessage
 
 
+    private fun insertAllocation(allocationItem: AllocationItem) = viewModelScope.launch {
+        repository.insertAllocation(allocationItem)
+        statusMessage.value = Event("Allocation Inserted Successfully ")
+    }
+
+
+    fun getAllReceipts() {
+        viewModelScope.launch {
+            receipts = repository.getAllReceipts()
+        }
+    }
+
+    fun getAllTransactions() {
+        viewModelScope.launch {
+            transactions = repository.getAllTransactions()
+        }
+    }
+
+    fun getAllAllocations() {
+        viewModelScope.launch {
+            allocations = repository.getAllAllocations()
+        }
+    }
+
     fun saveAllocation(receipt: String, mpesa_ref: String, amount_allocated: Int) {
+
         insertAllocation(AllocationItem(0, receipt, mpesa_ref, amount_allocated))
 
-    }
-
-    private fun insertAllocation(allocationItem: AllocationItem) = viewModelScope.launch {
-        val newRowId = repository.insertAllocation(allocationItem)
-        if (newRowId > -1) {
-            statusMessage.value = Event("Allocation Inserted Successfully $newRowId")
-        } else {
-            statusMessage.value = Event("Error Occurred")
-        }
-    }
-
-
-    fun getReceipts() = liveData {
-        repository.receipts.collect {
-            emit(it)
-        }
-    }
-
-    fun getTransactions() = liveData {
-        repository.transactions.collect {
-            emit(it)
-        }
-    }
-
-    fun getAllocations() = liveData {
-        repository.allocations.collect {
-            emit(it)
-        }
     }
 
     fun clearAllAllocation() {
@@ -51,11 +59,8 @@ class MainViewModel(private val repository: LocalRepository) : ViewModel() {
     }
 
     private fun clearAll() = viewModelScope.launch {
-        val noOfRowsDeleted = repository.deleteAllAllocations()
-        if (noOfRowsDeleted > 0) {
-            statusMessage.value = Event("$noOfRowsDeleted Allocations Deleted Successfully")
-        } else {
-            statusMessage.value = Event("Error Occurred")
-        }
+        repository.deleteAllAllocations()
+        statusMessage.value = Event("Allocations Deleted Successfully")
+
     }
 }

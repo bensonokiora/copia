@@ -7,63 +7,64 @@ import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import co.ke.copia.adapter.AllocationsAdapter
 import co.ke.copia.databinding.ActivityMainBinding
 import co.ke.copia.models.AllocationItem
 import co.ke.copia.models.PaymentItem
 import co.ke.copia.models.ReceiptItem
-import co.ke.copia.repo.CopiaDatabase
-import co.ke.copia.repo.LocalRepository
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var mainViewModel: MainViewModel
 
-    private lateinit var data_receipt: ArrayList<ReceiptItem>
-    private lateinit var data_payments: ArrayList<PaymentItem>
-    private lateinit var data_allocation: ArrayList<AllocationItem>
+    private lateinit var receiptList: ArrayList<ReceiptItem>
+    private lateinit var paymentsList: ArrayList<PaymentItem>
+    private lateinit var allocationList: ArrayList<AllocationItem>
 
-    private var receiptAmount: Int = 0;
+    private var receiptAmount: Int = 0
     private var mpesaAmount: Int = 0
-    private var allocatedAmount = 0
+    private var allocatedAmount: Int = 0
 
     private val TAG = MainActivity::class.java.simpleName
+
+
+    private val viewModel: MainViewModel by viewModels()
 
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        val receiptsDAO = CopiaDatabase.getInstance(application).receiptsDAO
-        val transactionsDAO = CopiaDatabase.getInstance(application).transactionsDAO
-        val allocationDAO = CopiaDatabase.getInstance(application).allocationDAO
 
-        val repository = LocalRepository(receiptsDAO, transactionsDAO, allocationDAO);
-        val factory = MainViewModelFactory(repository)
-        mainViewModel = ViewModelProvider(this, factory).get(MainViewModel::class.java)
         binding.lifecycleOwner = this
 
-        mainViewModel.message.observe(this) { it ->
+        viewModel.getAllAllocations()
+        viewModel.getAllReceipts()
+        viewModel.getAllTransactions()
+
+
+        viewModel.receipts.observe(this) {
+            getReceipts(it)
+        }
+
+        viewModel.transactions.observe(this) {
+            getTransactions(it)
+        }
+
+        viewModel.allocations.observe(this) {
+            getAllocations(it)
+        }
+        viewModel.message.observe(this) { it ->
             it.getContentIfNotHandled()?.let {
                 Toast.makeText(this, it, Toast.LENGTH_LONG).show()
             }
-        }
-
-        mainViewModel.getReceipts().observe(this) {
-            getReceipts(it)
-
-        }
-        mainViewModel.getTransactions().observe(this) {
-            getTransactions(it)
-        }
-        mainViewModel.getAllocations().observe(this) {
-            getAllocations(it)
         }
 
         binding.save.setOnClickListener {
@@ -76,30 +77,28 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun getReceipts(it: List<ReceiptItem>?) {
-        if (it != null) {
-            if (it.isNotEmpty()) {
-                data_receipt = java.util.ArrayList()
-                data_receipt.addAll(it)
-                val adapter = ArrayAdapter(
-                    this, android.R.layout.simple_spinner_item,
-                    data_receipt
-                )
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                binding.receiptSpinner.adapter = adapter
-                Log.d(TAG, "Adding data to spinner Receipts")
-            }
+    private fun getReceipts(it: List<ReceiptItem>) {
+        if (it.isNotEmpty()) {
+            receiptList = java.util.ArrayList()
+            receiptList.addAll(it)
+            val adapter = ArrayAdapter(
+                this, android.R.layout.simple_spinner_item,
+                receiptList
+            )
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            binding.receiptSpinner.adapter = adapter
+            Log.d(TAG, "Adding data to spinner Receipts")
         }
     }
 
     private fun getTransactions(it: List<PaymentItem>?) {
         if (it != null) {
             if (it.isNotEmpty()) {
-                data_payments = java.util.ArrayList()
-                data_payments.addAll(it)
+                paymentsList = java.util.ArrayList()
+                paymentsList.addAll(it)
                 val adapter = ArrayAdapter(
                     this, android.R.layout.simple_spinner_item,
-                    data_payments
+                    paymentsList
                 )
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 binding.mpesaRefSpinner.adapter = adapter
@@ -109,13 +108,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getAllocations(it: List<AllocationItem>) {
-        data_allocation = java.util.ArrayList()
+        allocationList = java.util.ArrayList()
         binding.allocationLayout.allocationParent.visibility = View.GONE
         if (it.isNotEmpty()) {
             binding.allocationLayout.allocationParent.visibility = View.VISIBLE
-            data_allocation.addAll(it)
+            allocationList.addAll(it)
 
-            val adapter = AllocationsAdapter(data_allocation)
+            val adapter = AllocationsAdapter(allocationList)
             val lm = LinearLayoutManager(this)
             binding.allocationLayout.recycler.layoutManager = lm
             binding.allocationLayout.recycler.adapter = adapter
@@ -132,19 +131,19 @@ class MainActivity : AppCompatActivity() {
             return
         }
         allocatedAmount = binding.amount.text.toString().toInt()
-        if (data_receipt.size > 0) {
-            for (i in data_receipt.indices) {
-                if (binding.receiptSpinner.selectedItem.toString() == data_receipt[i].receipt
+        if (receiptList.size > 0) {
+            for (i in receiptList.indices) {
+                if (binding.receiptSpinner.selectedItem.toString() == receiptList[i].receipt
                 ) {
-                    receiptAmount = data_receipt[i].amount_to_be_paid
+                    receiptAmount = receiptList[i].amount_to_be_paid
                 }
             }
         }
-        if (data_payments.size > 0) {
-            for (i in data_payments.indices) {
-                if (binding.mpesaRefSpinner.selectedItem.toString() == data_payments[i].ref
+        if (paymentsList.size > 0) {
+            for (i in paymentsList.indices) {
+                if (binding.mpesaRefSpinner.selectedItem.toString() == paymentsList[i].ref
                 ) {
-                    mpesaAmount = data_payments[i].amount_paid
+                    mpesaAmount = paymentsList[i].amount_paid
                 }
             }
         }
@@ -157,13 +156,13 @@ class MainActivity : AppCompatActivity() {
         var allocatedMpesaRefTotal = 0
         var receiptAmountTotal = 0
 
-        if (data_allocation.size > 0) {
-            for (y in data_allocation.indices) {
-                if (data_allocation[y].mpesa_ref == binding.mpesaRefSpinner.selectedItem.toString()) {
-                    allocatedMpesaRefTotal += data_allocation[y].amount_allocated
+        if (allocationList.size > 0) {
+            for (y in allocationList.indices) {
+                if (allocationList[y].mpesa_ref == binding.mpesaRefSpinner.selectedItem.toString()) {
+                    allocatedMpesaRefTotal += allocationList[y].amount_allocated
                 }
-                if (data_allocation[y].receipt == binding.receiptSpinner.selectedItem.toString()) {
-                    receiptAmountTotal += data_allocation[y].amount_allocated
+                if (allocationList[y].receipt == binding.receiptSpinner.selectedItem.toString()) {
+                    receiptAmountTotal += allocationList[y].amount_allocated
                 }
             }
         }
@@ -203,7 +202,7 @@ class MainActivity : AppCompatActivity() {
             )
             return
         }
-        mainViewModel.saveAllocation(
+        viewModel.saveAllocation(
             binding.receiptSpinner.selectedItem.toString(),
             binding.mpesaRefSpinner.selectedItem.toString(), allocatedAmount
         )
@@ -217,7 +216,7 @@ class MainActivity : AppCompatActivity() {
                 setPositiveButton(
                     R.string.delete
                 ) { _, _ ->
-                    mainViewModel.clearAllAllocation()
+                    viewModel.clearAllAllocation()
                 }
                 setNegativeButton(
                     R.string.cancel

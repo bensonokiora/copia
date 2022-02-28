@@ -33,9 +33,7 @@ class AllocationsAdapter(allocationItems: List<AllocationItem>?) :
     }
 
     class ViewHolder(var listItemBinding: ListItemBinding) :
-        RecyclerView.ViewHolder(listItemBinding.root) {
-
-    }
+        RecyclerView.ViewHolder(listItemBinding.root)
 
     init {
         this.allocationItems.addAll(allocationItems!!)
