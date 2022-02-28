@@ -26,4 +26,4 @@ Technical Android Interview (Section 2)
 
 ## SQLite Database Screenshots.
 
-<img src="images/db_receipts.png" width="500"/> <img src="images/db_transactions.png" width="500"/>
+<img src="images/db_receipts.png" width="800"/> <img src="images/db_transactions.png" width="800"/>
