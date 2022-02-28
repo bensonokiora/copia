@@ -1,9 +1,12 @@
-package co.ke.copia.repo
+package co.ke.copia.repo.sources
 
 import androidx.lifecycle.LiveData
 import co.ke.copia.models.AllocationItem
 import co.ke.copia.models.PaymentItem
 import co.ke.copia.models.ReceiptItem
+import co.ke.copia.repo.data.AllocationDAO
+import co.ke.copia.repo.data.ReceiptsDAO
+import co.ke.copia.repo.data.TransactionsDAO
 import javax.inject.Inject
 
 interface LocalDataSource {

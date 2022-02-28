@@ -2,6 +2,11 @@ package  co.ke.copia.di
 
 
 import co.ke.copia.repo.*
+import co.ke.copia.repo.data.AllocationDAO
+import co.ke.copia.repo.data.ReceiptsDAO
+import co.ke.copia.repo.data.TransactionsDAO
+import co.ke.copia.repo.sources.LocalDataSource
+import co.ke.copia.repo.sources.LocalDataSourceImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
