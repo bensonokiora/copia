@@ -9,6 +9,6 @@
     <string name="amount_allocated">Amount Allocated</string>
     <string name="delete">Delete</string>
     <string name="cancel">Cancel</string>
-    <string name="save">Save</string>
+    <string name="run">RUN</string>
 
 </resources>

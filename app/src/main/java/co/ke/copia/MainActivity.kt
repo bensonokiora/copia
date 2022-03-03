@@ -28,9 +28,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var paymentsList: ArrayList<PaymentItem>
     private lateinit var allocationList: ArrayList<AllocationItem>
 
-    private var receiptAmount: Int = 0
-    private var mpesaAmount: Int = 0
-    private var allocatedAmount: Int = 0
 
     private val TAG = MainActivity::class.java.simpleName
 
@@ -67,8 +64,14 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        binding.save.setOnClickListener {
-            insertAllocation()
+        binding.run.setOnClickListener {
+
+            insertAllocation("R001", "MG001", 100)
+            insertAllocation("R002", "MG002", 200)
+            insertAllocation("R002", "MG003", 200)
+            insertAllocation("R003", "MG003", 100)
+            insertAllocation("R003", "MG004", 250)
+
         }
 
         binding.fabDeleteAll.setOnClickListener {
@@ -81,13 +84,6 @@ class MainActivity : AppCompatActivity() {
         if (it.isNotEmpty()) {
             receiptList = java.util.ArrayList()
             receiptList.addAll(it)
-            val adapter = ArrayAdapter(
-                this, android.R.layout.simple_spinner_item,
-                receiptList
-            )
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            binding.receiptSpinner.adapter = adapter
-            Log.d(TAG, "Adding data to spinner Receipts")
         }
     }
 
@@ -96,60 +92,44 @@ class MainActivity : AppCompatActivity() {
             if (it.isNotEmpty()) {
                 paymentsList = java.util.ArrayList()
                 paymentsList.addAll(it)
-                val adapter = ArrayAdapter(
-                    this, android.R.layout.simple_spinner_item,
-                    paymentsList
-                )
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                binding.mpesaRefSpinner.adapter = adapter
-                Log.d(TAG, "Adding data to spinner Mpesa Transactions")
             }
         }
     }
 
     private fun getAllocations(it: List<AllocationItem>) {
         allocationList = java.util.ArrayList()
-        binding.allocationLayout.allocationParent.visibility = View.GONE
         if (it.isNotEmpty()) {
-            binding.allocationLayout.allocationParent.visibility = View.VISIBLE
             allocationList.addAll(it)
-
-            val adapter = AllocationsAdapter(allocationList)
-            val lm = LinearLayoutManager(this)
-            binding.allocationLayout.recycler.layoutManager = lm
-            binding.allocationLayout.recycler.adapter = adapter
-
-            Log.d(TAG, "Adding allocation data to recyclerview")
         }
     }
 
     @SuppressLint("SetTextI18n")
-    private fun insertAllocation() {
-        binding.logs.text = null
-        if (TextUtils.isEmpty(binding.amount.text)) {
-            binding.logs.text = "Oops! You haven't entered any allocation amount "
+    private fun insertAllocation(receipt: String, transaction: String, allocatedAmount: Int) {
+
+
+         var receiptAmount = 0
+         var mpesaAmount = 0
+
+        if (TextUtils.isEmpty(allocatedAmount.toString())) {
+            Log.d(TAG,"Oops! You haven't entered any allocation amount ")
             return
         }
-        allocatedAmount = binding.amount.text.toString().toInt()
         if (receiptList.size > 0) {
             for (i in receiptList.indices) {
-                if (binding.receiptSpinner.selectedItem.toString() == receiptList[i].receipt
-                ) {
+                if (receipt == receiptList[i].receipt) {
                     receiptAmount = receiptList[i].amount_to_be_paid
                 }
             }
         }
         if (paymentsList.size > 0) {
             for (i in paymentsList.indices) {
-                if (binding.mpesaRefSpinner.selectedItem.toString() == paymentsList[i].ref
-                ) {
+                if (transaction == paymentsList[i].ref) {
                     mpesaAmount = paymentsList[i].amount_paid
                 }
             }
         }
         if (allocatedAmount > receiptAmount) {
-            binding.logs.text =
-                "Oops! Kindly enter amount below " + receiptAmount + " For receipt " + binding.receiptSpinner.selectedItem.toString()
+            Log.d(TAG, "Oops! Kindly enter amount below $receiptAmount For receipt $receipt")
             return
         }
 
@@ -158,54 +138,42 @@ class MainActivity : AppCompatActivity() {
 
         if (allocationList.size > 0) {
             for (y in allocationList.indices) {
-                if (allocationList[y].mpesa_ref == binding.mpesaRefSpinner.selectedItem.toString()) {
+                if (allocationList[y].mpesa_ref == transaction) {
                     allocatedMpesaRefTotal += allocationList[y].amount_allocated
                 }
-                if (allocationList[y].receipt == binding.receiptSpinner.selectedItem.toString()) {
+                if (allocationList[y].receipt == receipt) {
                     receiptAmountTotal += allocationList[y].amount_allocated
                 }
             }
         }
         if (receiptAmountTotal >= receiptAmount) {
-            binding.logs.text =
-                "Oops! " + binding.receiptSpinner.selectedItem.toString() + " receipt has been fully paid. Kindly select another receipt "
-            Log.d(
-                TAG,
-                "Oops! " + binding.receiptSpinner.selectedItem.toString() + " receipt has been fully paid. Kindly select another receipt "
+            Log.d(TAG,"Oops! $receipt receipt has been fully paid. Kindly select another receipt "
             )
             return
         }
         if (allocatedAmount > receiptAmount - receiptAmountTotal) {
-            binding.logs.text =
-                "Oops! Kindly enter amount below " + (receiptAmount - receiptAmountTotal) + " For receipt " + binding.receiptSpinner.selectedItem.toString()
             Log.d(
                 TAG,
-                "Oops! Kindly enter amount below " + (receiptAmount - receiptAmountTotal) + " For receipt " + binding.receiptSpinner.selectedItem.toString()
+                "Oops! Kindly enter amount below " + (receiptAmount - receiptAmountTotal) + " For receipt " + receipt
             )
             return
         }
         if (allocatedMpesaRefTotal >= mpesaAmount) {
-            binding.logs.text =
-                "Oops! " + binding.mpesaRefSpinner.selectedItem.toString() + " amount has depleted. Kindly use another payment transaction "
-            Log.d(
-                TAG,
-                "Oops! " + binding.mpesaRefSpinner.selectedItem.toString() + " amount has depleted. Kindly use another payment transaction "
-            )
+            Log.d(TAG,"Oops! $transaction amount has depleted. Kindly use another payment transaction ")
             return
         }
         if (allocatedAmount > mpesaAmount) {
-            binding.logs.text =
-                "Oops! " + binding.mpesaRefSpinner.selectedItem.toString() + " amount is less than the allocated amount. Kindly enter a lower amount "
-            Log.d(
-                TAG,
-                "Oops! " + binding.mpesaRefSpinner.selectedItem.toString() + " amount is less than the allocated amount. Kindly enter a lower amount "
-            )
+            Log.d(TAG,"Oops! $transaction amount is less than the allocated amount. Kindly enter a lower amount ")
             return
         }
         viewModel.saveAllocation(
-            binding.receiptSpinner.selectedItem.toString(),
-            binding.mpesaRefSpinner.selectedItem.toString(), allocatedAmount
+            receipt,
+            transaction, allocatedAmount
         )
+
+        Log.d("Inserted", "Receipt: "+ receipt + "Mpesa Ref: "+ transaction+"Amount Allocated: "+allocatedAmount)
+        binding.logs.text ="Receipt: "+ receipt + "Mpesa Ref: "+ transaction+"Amount Allocated: "+allocatedAmount
+
     }
 
     private fun deleteAllocations() {
