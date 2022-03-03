@@ -167,7 +167,9 @@ class MainActivity : AppCompatActivity() {
             transaction, allocatedAmount
         )
 
-        Log.d("Inserted", "Receipt: "+ receipt + "Mpesa Ref: "+ transaction+"Amount Allocated: "+allocatedAmount)
+        Log.d("Inserted",
+            "Receipt: $receipt Mpesa Ref: $transaction Amount Allocated: $allocatedAmount"
+        )
         //binding.logs.text ="Receipt: "+ receipt + "Mpesa Ref: "+ transaction+"Amount Allocated: "+allocatedAmount
 
     }
