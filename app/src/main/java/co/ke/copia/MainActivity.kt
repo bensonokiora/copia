@@ -4,15 +4,11 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
-import android.view.View
-import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.recyclerview.widget.LinearLayoutManager
-import co.ke.copia.adapter.AllocationsAdapter
 import co.ke.copia.databinding.ActivityMainBinding
 import co.ke.copia.models.AllocationItem
 import co.ke.copia.models.PaymentItem
@@ -24,9 +20,9 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    private lateinit var receiptList: ArrayList<ReceiptItem>
-    private lateinit var paymentsList: ArrayList<PaymentItem>
-    private lateinit var allocationList: ArrayList<AllocationItem>
+    private lateinit var receiptList: MutableList<ReceiptItem>
+    private lateinit var paymentsList: MutableList<PaymentItem>
+    private lateinit var allocationList: MutableList<AllocationItem>
 
 
     private val TAG = MainActivity::class.java.simpleName
@@ -172,7 +168,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         Log.d("Inserted", "Receipt: "+ receipt + "Mpesa Ref: "+ transaction+"Amount Allocated: "+allocatedAmount)
-        binding.logs.text ="Receipt: "+ receipt + "Mpesa Ref: "+ transaction+"Amount Allocated: "+allocatedAmount
+        //binding.logs.text ="Receipt: "+ receipt + "Mpesa Ref: "+ transaction+"Amount Allocated: "+allocatedAmount
 
     }
 
