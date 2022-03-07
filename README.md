@@ -20,10 +20,6 @@ Technical Android Interview (Section 2)
       that allows binding of UI components in layouts to data sources.
 - [dagger-hilt](https://dagger.dev/hilt/) - Dependency Injection Framework (Kotlin).
 
-## Screenshots.
-
-<img src="images/ss_dark.jpeg" width="250"/> <img src="images/ss_light.jpeg" width="250"/> 
-
 ## SQLite Database Screenshots.
 
 <img src="images/db_receipts.png" width="800"/> <img src="images/db_transactions.png" width="800"/>
